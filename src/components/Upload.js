@@ -1,7 +1,10 @@
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
 import { useState } from "react";
 import {
   Button,
   Checkbox,
+  Flex,
   Table,
   TableCaption,
   Tbody,
@@ -41,6 +44,14 @@ const Upload = () => {
     setItems(items);
   };
 
+  const handleClear = () => {
+    Object.values(checkedIds).forEach((id) => {
+      items[id - 1].status = "";
+      items[id - 1].remark = "";
+      console.log(items[id - 1]);
+    });
+    setCheckedIds([]);
+  };
   const readExcel = (file) => {
     const promise = new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -69,65 +80,93 @@ const Upload = () => {
       setItems(d);
     });
   };
-  return (
-    <div>
-      <input
-        type="file"
-        accept=".xls,.xlsx"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          readExcel(file);
-        }}
-      />
-      <Button variant="link" colorScheme="blue" ms={1} onClick={handleApprove}>
-        Approve
-      </Button>
-      <Button variant="link" colorScheme="blue" ms={1} onClick={handleReject}>
-        Reject
-      </Button>
-      <Table variant="striped">
-        <TableCaption>Parsing and displaying the Excel sheet</TableCaption>
-        <Thead>
-          <Tr>
-            <Th> Action </Th>
-            <Th>Mobile</Th>
-            <Th>Id</Th>
-            <Th>Earning</Th>
-            <Th>Status</Th>
-            <Th>Remark</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {items.map((d) => (
-            <Tr key={d.earning_id}>
-              <Td id={d.earning_id}>
-                <Checkbox
-                  isChecked={checkedIds.includes(d.earning_id)}
-                  onChange={(event) => {
-                    event.stopPropagation();
-                    const index = checkedIds.indexOf(d.earning_id);
 
-                    if (index > -1) {
-                      setCheckedIds([
-                        ...checkedIds.slice(0, index),
-                        ...checkedIds.slice(index + 1),
-                      ]);
-                    } else {
-                      setCheckedIds([...checkedIds, d.earning_id]);
-                    }
-                  }}
-                />
-              </Td>
-              <Td>{d.mobile}</Td>
-              <Td>{d.earning_id}</Td>
-              <Td>{d.earning}</Td>
-              <Td>{d.status}</Td>
-              <Td>{d.remark}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </div>
+  return (
+    <>
+      <Flex width="100%" direction="column">
+        <Flex justifyContent="center" marginTop="20px">
+          <input
+            type="file"
+            accept=".xls,.xlsx"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              readExcel(file);
+            }}
+          />
+          <Flex marginLeft="auto" marginRight="2rem">
+            <Button
+              variant="outline"
+              colorScheme="blue"
+              ms={1}
+              onClick={handleApprove}
+            >
+              Approve
+            </Button>
+            <Button
+              variant="outline"
+              colorScheme="red"
+              ms={1}
+              onClick={handleReject}
+            >
+              Reject
+            </Button>
+            <Button
+              variant="outline"
+              colorScheme="grey"
+              ms={1}
+              onClick={handleClear}
+            >
+              Clear
+            </Button>
+          </Flex>
+        </Flex>
+
+        <Flex minWidth="50%" maxWidth="100%">
+          <Table variant="striped">
+            <TableCaption>Parsing and displaying the Excel sheet</TableCaption>
+            <Thead>
+              <Tr>
+                <Th> Action </Th>
+                <Th>Mobile</Th>
+                <Th>Id</Th>
+                <Th>Earning</Th>
+                <Th>Status</Th>
+                <Th>Remark</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {items.map((d) => (
+                <Tr key={d.earning_id}>
+                  <Td id={d.earning_id}>
+                    <Checkbox
+                      isChecked={checkedIds.includes(d.earning_id)}
+                      onChange={(event) => {
+                        event.stopPropagation();
+                        const index = checkedIds.indexOf(d.earning_id);
+
+                        if (index > -1) {
+                          setCheckedIds([
+                            ...checkedIds.slice(0, index),
+                            ...checkedIds.slice(index + 1),
+                          ]);
+                        } else {
+                          setCheckedIds([...checkedIds, d.earning_id]);
+                        }
+                      }}
+                    />
+                  </Td>
+                  <Td>{d.mobile}</Td>
+                  <Td>{d.earning_id}</Td>
+                  <Td>{d.earning}</Td>
+                  <Td>{d.status}</Td>
+                  <Td>{d.remark}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Flex>
+      </Flex>
+    </>
   );
 };
 
