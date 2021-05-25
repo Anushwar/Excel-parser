@@ -1,5 +1,7 @@
 import { useState } from "react";
 import {
+  Button,
+  Checkbox,
   Table,
   TableCaption,
   Tbody,
@@ -12,6 +14,19 @@ import XLSX from "xlsx";
 
 const Upload = () => {
   const [items, setItems] = useState([]);
+  const [checked, setChecked] = useState(false);
+  //   const [approve, setApprove] = useState("");
+  //   const [reject, setReject] = useState("");
+
+  const handleApprove = (d) => {
+    console.log(checked);
+    console.log(d);
+  };
+
+  const handleReject = (d) => {
+    console.log(d);
+    console.log(items);
+  };
 
   const readExcel = (file) => {
     const promise = new Promise((resolve, reject) => {
@@ -39,7 +54,6 @@ const Upload = () => {
 
     promise.then((d) => {
       setItems(d);
-      console.log(d);
     });
   };
   return (
@@ -52,7 +66,17 @@ const Upload = () => {
           readExcel(file);
         }}
       />
-
+      <Button
+        variant="link"
+        colorScheme="blue"
+        ms={1}
+        onClick={handleApprove(items[0])}
+      >
+        Approve
+      </Button>
+      <Button variant="link" colorScheme="blue" ms={1} onClick={handleReject}>
+        Reject
+      </Button>
       <Table variant="striped">
         <TableCaption>Parsing and displaying the Excel sheet</TableCaption>
         <Thead>
@@ -65,11 +89,13 @@ const Upload = () => {
         </Thead>
         <Tbody>
           {items.map((d) => (
-            <Tr key={d.mobile}>
+            <Tr key={d.earning_id}>
               <Td>{d.mobile}</Td>
               <Td>{d.earning_id}</Td>
               <Td>{d.earning}</Td>
-              <Td>Approve| Reject</Td>
+              <Td>
+                <Checkbox isChecked={() => setChecked(true)} />
+              </Td>
             </Tr>
           ))}
         </Tbody>
