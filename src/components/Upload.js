@@ -14,18 +14,31 @@ import XLSX from "xlsx";
 
 const Upload = () => {
   const [items, setItems] = useState([]);
-  const [checked, setChecked] = useState(false);
-  //   const [approve, setApprove] = useState("");
-  //   const [reject, setReject] = useState("");
+  const [checkedIds, setCheckedIds] = useState([]);
 
-  const handleApprove = (d) => {
-    console.log(checked);
-    console.log(d);
+  const handleApprove = () => {
+    Object.values(checkedIds).forEach((id) => {
+      if (items[id - 1] != null) {
+        items[id - 1].status = "Approved";
+        items[id - 1].remark = "";
+      }
+      console.log(items[id - 1]);
+    });
+    setCheckedIds([]);
+    setItems(items);
   };
 
-  const handleReject = (d) => {
-    console.log(d);
-    console.log(items);
+  const handleReject = () => {
+    const remark = window.prompt("Enter your remark for rejecting: ");
+    Object.values(checkedIds).forEach((id) => {
+      if (items[id - 1] != null) {
+        items[id - 1].status = "Rejected";
+        items[id - 1].remark = remark;
+      }
+      console.log(items[id - 1]);
+    });
+    setCheckedIds([]);
+    setItems(items);
   };
 
   const readExcel = (file) => {
@@ -66,12 +79,7 @@ const Upload = () => {
           readExcel(file);
         }}
       />
-      <Button
-        variant="link"
-        colorScheme="blue"
-        ms={1}
-        onClick={handleApprove(items[0])}
-      >
+      <Button variant="link" colorScheme="blue" ms={1} onClick={handleApprove}>
         Approve
       </Button>
       <Button variant="link" colorScheme="blue" ms={1} onClick={handleReject}>
@@ -81,21 +89,40 @@ const Upload = () => {
         <TableCaption>Parsing and displaying the Excel sheet</TableCaption>
         <Thead>
           <Tr>
+            <Th> Action </Th>
             <Th>Mobile</Th>
             <Th>Id</Th>
             <Th>Earning</Th>
-            <Th> Action </Th>
+            <Th>Status</Th>
+            <Th>Remark</Th>
           </Tr>
         </Thead>
         <Tbody>
           {items.map((d) => (
             <Tr key={d.earning_id}>
+              <Td id={d.earning_id}>
+                <Checkbox
+                  isChecked={checkedIds.includes(d.earning_id)}
+                  onChange={(event) => {
+                    event.stopPropagation();
+                    const index = checkedIds.indexOf(d.earning_id);
+
+                    if (index > -1) {
+                      setCheckedIds([
+                        ...checkedIds.slice(0, index),
+                        ...checkedIds.slice(index + 1),
+                      ]);
+                    } else {
+                      setCheckedIds([...checkedIds, d.earning_id]);
+                    }
+                  }}
+                />
+              </Td>
               <Td>{d.mobile}</Td>
               <Td>{d.earning_id}</Td>
               <Td>{d.earning}</Td>
-              <Td>
-                <Checkbox isChecked={() => setChecked(true)} />
-              </Td>
+              <Td>{d.status}</Td>
+              <Td>{d.remark}</Td>
             </Tr>
           ))}
         </Tbody>
